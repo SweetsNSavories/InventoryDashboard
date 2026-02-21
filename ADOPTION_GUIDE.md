@@ -78,10 +78,13 @@ See `Docs/DataverseSchemaDocumentation.html` for a full visual breakdown.
    *   `PowerPlatform:DataverseUrl`: https://your-org.crm.dynamics.com
    *   `PowerPlatform:InteractiveAuth`: `true` (if you want to use the email-based device login for full hydration)
    *   `PowerPlatform:AdminEmail`: The email address of the administrator who will perform the interactive login.
-3. **Interactive Login Flow**:
-   *   When the function starts, if `InteractiveAuth` is set to `true`, it will send an email to the `AdminEmail` with a **Device Code** and URL.
-   *   The function will wait for the admin to complete the login process at `https://microsoft.com/devicelogin`.
-   *   Once logged in, the function will continue with the "Full Hydration" sync.
+3. **Scheduling & Daily Workflow**:
+   *   **The Timer**: By default, the function is scheduled for a daily run (e.g., `0 0 14 * * *` for 9 AM EST). You can adjust this "cron" expression in `SyncFunction.cs` to fit your team's schedule.
+   *   **Morning Ritual**: 
+      1. Every morning (at the scheduled time), the function fires and sends a "Login Required" email to the **AdminEmail**.
+      2. The Administrator checks their inbox, clicks the link, and enters the code.
+      3. The Function (which is patiently waiting) detects the login and immediately begins the high-priority sync for storage and license metrics.
+   *   **Timeout Note**: The Azure Function will wait for approx 15-20 minutes for the login. If not completed, it will time out and attempt again at the next scheduled interval.
 
 ## ❓ Troubleshooting & FAQ
 

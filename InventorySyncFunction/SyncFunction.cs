@@ -16,7 +16,7 @@ namespace InventorySyncFunction
         }
 
         [Function("DailyInventorySync")]
-        public async Task Run([TimerTrigger("0 0 12 * * *", RunOnStartup = false)] TimerInfo myTimer)
+        public async Task Run([TimerTrigger("0 0 14 * * *", RunOnStartup = false)] TimerInfo myTimer)
         {
             _logger.LogInformation($"🚀 Trigger Fired at: {DateTime.Now}");
 
