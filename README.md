@@ -2,6 +2,9 @@
 
 A comprehensive, high-performance monitoring and inventory dashboard for Microsoft Power Platform.
 
+![Inventory Sentinel Dashboard](./Docs/dashboard_preview.png)
+
+
 ## ✨ Features
 *   **Omni-Sync Engine**: Consolidates data from BAP, Power Automate, and Dataverse APIs.
 *   **Interactive Dashboard**: Real-time view of environments, storage consumption, and asset health.
