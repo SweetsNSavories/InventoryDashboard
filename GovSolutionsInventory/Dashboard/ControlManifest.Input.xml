@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="InventoryMain" constructor="Dashboard" version="3.0.0" display-name-key="Inventory Dashboard" description-key="Visualizes Power Platform Inventory" control-type="virtual">
+    <property name="dummyField" display-name-key="dummyField" description-key="dummyField" of-type="SingleLine.Text" usage="bound" required="true" />
+    <property name="SolutionMap" display-name-key="SolutionMap" description-key="Solution Map JSON" of-type="Multiple" usage="input" required="false" />
+    <property name="EnvironmentMap" display-name-key="EnvironmentMap" description-key="Environment Map JSON" of-type="Multiple" usage="input" required="false" />
+    <property name="RequiredEnvNames" display-name-key="RequiredEnvNames" description-key="Filtered Environment Names" of-type="SingleLine.Text" usage="output" required="false" />
+    <resources>
+      <code path="index.ts" order="1" />
+      <platform-library name="React" version="16.8.6" />
+    </resources>
+    <feature-usage>
+      <uses-feature name="WebAPI" required="true" />
+    </feature-usage>
+  </control>
+</manifest>

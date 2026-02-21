@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Platform Inventory - Data Schema</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Plus+Jakarta+Sans', sans-serif;
+            line-height: 1.6;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        /* Diagram Section */
+        .diagram-outer {
+            background: rgba(0,0,0,0.2);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            margin-bottom: 60px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diagram-outer::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .entity-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            width: 340px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .entity-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .entity-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .entity-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .entity-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .column-list {
+            list-style: none;
+        }
+
+        .column-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.9rem;
+        }
+
+        .col-name {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-main);
+        }
+
+        .col-type {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.05);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .pk { color: var(--warning); font-weight: 700; border: 1px solid var(--warning); }
+        .fk { color: var(--accent); font-weight: 700; border: 1px solid var(--accent); }
+
+        /* Tables Grid */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 30px;
+        }
+
+        .rel-line {
+            height: 2px;
+            background: var(--accent);
+            flex-grow: 1;
+            align-self: center;
+            opacity: 0.3;
+            position: relative;
+        }
+
+        .rel-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: -3px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            display: block;
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .description-box {
+            margin-top: 40px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .description-box h2 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .relationship-map {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .rel-entry {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .arrow { color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Governance Bridge Schema</h1>
+            <p class="subtitle">Dataverse Infrastructure for Microsoft Power Platform Inventory</p>
+        </header>
+
+        <div class="diagram-outer">
+            <div style="display: flex; gap: 40px; align-items: flex-start; position: relative; z-index: 5;">
+                <!-- Environment Table -->
+                <div class="entity-card">
+                    <span class="tag">Core Infrastructure</span>
+                    <div class="entity-header">
+                        <div class="entity-icon">E</div>
+                        <div class="entity-name">gov_environment</div>
+                    </div>
+                    <ul class="column-list">
+                        <li class="column-item"><span class="col-name">gov_envid</span> <span class="col-type pk">PK (Guid)</span></li>
+                        <li class="column-item"><span class="col-name">gov_displayname</span> <span class="col-type">String</span></li>
+                        <li class="column-item"><span class="col-name">gov_type</span> <span class="col-type">Choice</span></li>
+                        <li class="column-item"><span class="col-name">gov_region</span> <span class="col-type">String</span></li>
+                        <li class="column-item"><span class="col-name">gov_sku</span> <span class="col-type">String</span></li>
+                        <li class="column-item"><span class="col-name">gov_isdefault</span> <span class="col-type">Boolean</span></li>
+                        <li class="column-item"><span class="col-name">gov_metadata</span> <span class="col-type">Memo</span></li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 50px; margin-top: 20px;">
+                    <!-- Solution Table -->
+                    <div class="entity-card">
+                        <span class="tag">Packaging</span>
+                        <div class="entity-header">
+                            <div class="entity-icon" style="background: var(--warning);">S</div>
+                            <div class="entity-name">gov_solution</div>
+                        </div>
+                        <ul class="column-list">
+                            <li class="column-item"><span class="col-name">gov_solutionid</span> <span class="col-type pk">PK (Guid)</span></li>
+                            <li class="column-item"><span class="col-name">gov_envid</span> <span class="col-type fk">FK (Env)</span></li>
+                            <li class="column-item"><span class="col-name">gov_displayname</span> <span class="col-type">String</span></li>
+                            <li class="column-item"><span class="col-name">gov_uniquename</span> <span class="col-type">String</span></li>
+                            <li class="column-item"><span class="col-name">gov_version</span> <span class="col-type">String</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Asset Table -->
+                    <div class="entity-card">
+                        <span class="tag">Components</span>
+                        <div class="entity-header">
+                            <div class="entity-icon" style="background: var(--success);">A</div>
+                            <div class="entity-name">gov_asset</div>
+                        </div>
+                        <ul class="column-list">
+                            <li class="column-item"><span class="col-name">gov_assetid</span> <span class="col-type pk">PK (Guid)</span></li>
+                            <li class="column-item"><span class="col-name">gov_envid</span> <span class="col-type fk">FK (Env)</span></li>
+                            <li class="column-item"><span class="col-name">gov_solutionid</span> <span class="col-type fk">FK (Sol)</span></li>
+                            <li class="column-item"><span class="col-name">gov_type</span> <span class="col-type">App/Flow</span></li>
+                            <li class="column-item"><span class="col-name">gov_owner</span> <span class="col-type">String</span></li>
+                            <li class="column-item"><span class="col-name">gov_state</span> <span class="col-type">Status</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="description-box">
+            <h2>Data Dictionary & Relationships</h2>
+            <p style="color: var(--text-dim); margin-bottom: 25px;">The schema is designed for multi-tenant scalability, mapping logical cloud environments to physical solution objects and their constituent assets.</p>
+            
+            <div class="relationship-map">
+                <div class="rel-entry">
+                    <strong style="width: 150px;">Environment Parent</strong>
+                    <span class="arrow">➔</span>
+                    <span>Contains N Solutions and N Assets (1:N)</span>
+                </div>
+                <div class="rel-entry">
+                    <strong style="width: 150px;">Solution Context</strong>
+                    <span class="arrow">➔</span>
+                    <span>Groups multiple Assets via Solution ID (1:N)</span>
+                </div>
+                <div class="rel-entry">
+                    <strong style="width: 150px;">Metadata Store</strong>
+                    <span class="arrow">➔</span>
+                    <span>`gov_metadata` stores the raw API JSON for long-term technical audit</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; color: var(--text-dim); font-size: 0.8rem;">
+            &copy; 2026 Governance Bridge Initiative - System Schema v2.1
+        </div>
+    </div>
+</body>
+</html>

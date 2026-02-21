@@ -1,0 +1,148 @@
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.26013.135" OrganizationSchemaType="Full" CRMServerServiceabilityVersion="9.2.26014.00139">
+  <Entities>
+    <Entity>
+      <Name LocalizedName="User" OriginalName="">SystemUser</Name>
+      <EntityInfo>
+        <entity Name="SystemUser" unmodified="1">
+          <attributes />
+        </entity>
+      </EntityInfo>
+      <FormXml>
+        <forms type="main">
+          <systemform>
+            <formid>{85d82b8d-2cfe-f011-8407-6045bdec0f2e}</formid>
+            <IntroducedVersion>1.0</IntroducedVersion>
+            <FormPresentation>0</FormPresentation>
+            <FormActivationState>1</FormActivationState>
+            <form showImage="false" maxWidth="1920" headerdensity="HighWithControls">
+              <tabs>
+                <tab name="SUMMARY_TAB" verticallayout="true" id="{aa000001-0001-0001-0001-000000000001}" IsUserDefined="0" locklevel="0" showlabel="true" expanded="true">
+                  <labels>
+                    <label description="Asset Inventory" languagecode="1033" />
+                  </labels>
+                  <columns>
+                    <column width="100%">
+                      <sections>
+                        <section name="inventory_section" showlabel="true" showbar="false" locklevel="0" id="{aa000001-0001-0001-0001-000000000002}" IsUserDefined="0" layout="varwidth" columns="1" labelwidth="115" celllabelalignment="Left" celllabelposition="Left">
+                          <labels>
+                            <label description="Dashboard" languagecode="1033" />
+                          </labels>
+                          <rows>
+                            <row />
+                            <row>
+                              <cell id="{bd9ce5c7-3f84-4856-a9b6-5d23fe4a74d9}" locklevel="0" colspan="1" rowspan="1" showlabel="false">
+                                <labels>
+                                  <label description="Middle Name" languagecode="1033" />
+                                </labels>
+                                <control id="middlename" classid="{F9A8A302-114E-466A-B582-6771B2AE0D92}" datafieldname="middlename" disabled="false" uniqueid="{a4e36b15-6c81-45b3-afc7-9499e4da58f7}" />
+                              </cell>
+                            </row>
+                          </rows>
+                        </section>
+                      </sections>
+                    </column>
+                  </columns>
+                </tab>
+              </tabs>
+              <header id="{aa000001-0001-0001-0001-000000000004}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+                <rows>
+                  <row>
+                    <cell id="{aa000001-0001-0001-0001-000000000005}" showlabel="false" labelid="{aa000001-0001-0001-0001-000000000006}">
+                      <labels>
+                        <label description="" languagecode="1033" />
+                      </labels>
+                    </cell>
+                  </row>
+                </rows>
+              </header>
+              <DisplayConditions Order="99">
+                <Everyone />
+              </DisplayConditions>
+              <footer id="{5767aa7f-ba9d-44ff-87fb-869ce4761b04}" celllabelposition="Top" columns="111" labelwidth="115" celllabelalignment="Left">
+                <rows>
+                  <row>
+                    <cell id="{cf65af75-493a-4030-8f4a-e72c1c8b56ad}" showlabel="false">
+                      <labels>
+                        <label description="" languagecode="1033" />
+                      </labels>
+                    </cell>
+                    <cell id="{de9dd508-1437-4219-b48f-c3fbcabcaf78}" showlabel="false">
+                      <labels>
+                        <label description="" languagecode="1033" />
+                      </labels>
+                    </cell>
+                    <cell id="{04f59c9a-655d-4fb6-b91b-2a93962b5d26}" showlabel="false">
+                      <labels>
+                        <label description="" languagecode="1033" />
+                      </labels>
+                    </cell>
+                  </row>
+                </rows>
+              </footer>
+              <controlDescriptions>
+                <controlDescription forControl="{a4e36b15-6c81-45b3-afc7-9499e4da58f7}">
+                  <customControl id="{4273EDBD-AC1D-40D3-9FB2-095C621B552D}">
+                    <parameters>
+                      <datafieldname>middlename</datafieldname>
+                    </parameters>
+                  </customControl>
+                  <customControl formFactor="0" name="gov_InventoryMain.Dashboard">
+                    <parameters>
+                      <dummyField type="SingleLine.Text">middlename</dummyField>
+                    </parameters>
+                  </customControl>
+                  <customControl formFactor="2" name="gov_InventoryMain.Dashboard">
+                    <parameters>
+                      <dummyField type="SingleLine.Text">middlename</dummyField>
+                    </parameters>
+                  </customControl>
+                  <customControl formFactor="1" name="gov_InventoryMain.Dashboard">
+                    <parameters>
+                      <dummyField type="SingleLine.Text">middlename</dummyField>
+                    </parameters>
+                  </customControl>
+                </controlDescription>
+              </controlDescriptions>
+            </form>
+            <IsCustomizable>1</IsCustomizable>
+            <CanBeDeleted>1</CanBeDeleted>
+            <LocalizedNames>
+              <LocalizedName description="Asset Inventory Dashboard" languagecode="1033" />
+            </LocalizedNames>
+          </systemform>
+        </forms>
+      </FormXml>
+      <RibbonDiffXml>
+        <CustomActions />
+        <Templates>
+          <RibbonTemplates Id="Mscrm.Templates"></RibbonTemplates>
+        </Templates>
+        <CommandDefinitions />
+        <RuleDefinitions>
+          <TabDisplayRules />
+          <DisplayRules />
+          <EnableRules />
+        </RuleDefinitions>
+        <LocLabels />
+      </RibbonDiffXml>
+    </Entity>
+  </Entities>
+  <Roles></Roles>
+  <Workflows></Workflows>
+  <FieldSecurityProfiles></FieldSecurityProfiles>
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls>
+    <CustomControl>
+      <Name>gov_InventoryMain.Dashboard</Name>
+      <FileName>/Controls/gov_InventoryMain.Dashboard/ControlManifest.xml</FileName>
+    </CustomControl>
+  </CustomControls>
+  <EntityDataProviders />
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>
