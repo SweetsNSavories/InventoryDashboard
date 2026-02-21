@@ -32,8 +32,19 @@ The project supports an `--interactive` flag. This uses **Device Auth Code** via
 ## 🚀 Deployment Steps
 
 ### Phase 1: Dataverse Setup
-1.  Import the unmanaged solution from `Solutions/InventorySolution_Unmanaged.zip` into your dedicated Governance environment.
-2.  Assign the `Gov Inventory Dashboard` PCF to the desired form (typically on the `SystemUser` or a custom configuration table).
+1. **Import Solution**: Import the unmanaged solution from `Solutions/InventorySolution_Unmanaged.zip` into your dedicated Governance environment.
+   *   **Note**: This solution currently includes the PCF Dashboard control and a modified **User (SystemUser)** form named "Asset Inventory Dashboard".
+2. **PCF Form Placement**: 
+   *   Navigate to the **SystemUser** table > **Forms**.
+   *   Open the "Asset Inventory Dashboard" form.
+   *   The PCF control is already placed on the `Middle Name` (`middlename`) field.
+   *   **Action**: For the best experience, we recommend removing all other controls from this section/tab or expanding the PCF section to occupy the full width/height of the form.
+3. **Table Schema**: 
+   *   Ensure the following custom tables exist in your environment (these should be part of the solution, but verify if they were created during import):
+       *   `gov_environment`
+       *   `gov_solution`
+       *   `gov_asset`
+   *   If they derived from the import, you are ready. If not, please refer to `Docs/DataverseSchemaDocumentation.html` to manually verify the schema.
 
 ### Phase 2: Inventory Puller Configuration
 1.  Navigate to `InventoryPuller/`.
@@ -64,6 +75,20 @@ The system pushes data into three primary tables:
 3.  **gov_asset**: Individual Apps, Flows, and Power Pages.
 
 See `Docs/DataverseSchemaDocumentation.html` for a full visual breakdown.
+
+### Phase 3: Azure Function Configuration
+1. Deploy the `InventorySyncFunction` project to your Azure Function App.
+2. In the **Configuration** blade of the Function App, add the following App Settings:
+   *   `PowerPlatform:ClientId`: YOUR_SPN_CLIENT_ID
+   *   `PowerPlatform:ClientSecret`: YOUR_SPN_SECRET
+   *   `PowerPlatform:TenantId`: YOUR_TENANT_ID
+   *   `PowerPlatform:DataverseUrl`: https://your-org.crm.dynamics.com
+   *   `PowerPlatform:InteractiveAuth`: `true` (if you want to use the email-based device login for full hydration)
+   *   `PowerPlatform:AdminEmail`: The email address of the administrator who will perform the interactive login.
+3. **Interactive Login Flow**:
+   *   When the function starts, if `InteractiveAuth` is set to `true`, it will send an email to the `AdminEmail` with a **Device Code** and URL.
+   *   The function will wait for the admin to complete the login process at `https://microsoft.com/devicelogin`.
+   *   Once logged in, the function will continue with the "Full Hydration" sync.
 
 ## ❓ Troubleshooting & FAQ
 

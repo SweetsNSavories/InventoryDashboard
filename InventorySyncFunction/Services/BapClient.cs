@@ -11,14 +11,31 @@ namespace InventorySyncFunction.Services
 {
     public class BapClient : IBapClient
     {
-        private readonly ClientSecretCredential _cred;
+        private readonly TokenCredential _cred;
         private readonly ILogger _logger;
         private readonly Microsoft.PowerPlatform.Management.ServiceClient _mgmt;
 
-        public BapClient(string tenantId, string clientId, string clientSecret, ILogger logger)
+        public BapClient(string tenantId, string clientId, string clientSecret, ILogger logger, bool interactive = false, Func<string, Task> onMessage = null)
         {
-            _cred = new ClientSecretCredential(tenantId, clientId, clientSecret);
             _logger = logger;
+
+            if (interactive)
+            {
+                _cred = new DeviceCodeCredential(new DeviceCodeCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ClientId = "04b07795-8ddb-461a-bbee-02f9e1bf7b46", // Azure CLI ID
+                    DeviceCodeCallback = async (code, cancellation) =>
+                    {
+                        if (onMessage != null) await onMessage(code.Message);
+                        _logger.LogInformation($"🔑 AUTH REQUIRED: {code.Message}");
+                    }
+                });
+            }
+            else
+            {
+                _cred = new ClientSecretCredential(tenantId, clientId, clientSecret);
+            }
 
             // Initialize Management SDK (Kiota)
             Microsoft.Kiota.Abstractions.Serialization.ParseNodeFactoryRegistry.DefaultInstance.ContentTypeAssociatedFactories.TryAdd("application/json", new Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory());
@@ -90,8 +107,8 @@ namespace InventorySyncFunction.Services
 
     public class UnifiedAuthProvider : Microsoft.Kiota.Abstractions.Authentication.IAuthenticationProvider
     {
-        private readonly ClientSecretCredential _cred;
-        public UnifiedAuthProvider(ClientSecretCredential cred) => _cred = cred;
+        private readonly TokenCredential _cred;
+        public UnifiedAuthProvider(TokenCredential cred) => _cred = cred;
         public async Task AuthenticateRequestAsync(Microsoft.Kiota.Abstractions.RequestInformation request, Dictionary<string, object>? context = null, System.Threading.CancellationToken token = default)
         {
             var result = await _cred.GetTokenAsync(new Azure.Core.TokenRequestContext(new[] { "https://api.powerplatform.com/.default" }), token);

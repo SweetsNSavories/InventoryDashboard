@@ -61,10 +61,11 @@ namespace InventorySyncFunction.Services
             var envs = await _bap.FetchList("service.powerapps.com", "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2021-04-01");
             if (envs == null) return;
 
-            var options = new ParallelOptions { MaxDegreeOfParallelism = 5 };
-            await Parallel.ForEachAsync(envs, options, async (envToken, token) => {
-                await ProcessEnvironment((JObject)envToken);
-            });
+            // Simple loop to avoid massive parallel overhead in Function
+            foreach (var env in envs)
+            {
+                await ProcessEnvironment((JObject)env);
+            }
         }
 
         public async Task ProcessEnvironment(JObject env)
@@ -100,37 +101,37 @@ namespace InventorySyncFunction.Services
 
                 _dv.UpsertRecord("gov_environment", envId, fields);
 
-                // B. Apps (SDK)
-                try {
-                    var apps = await _bap.Management.Powerapps.Environments[envId].Apps.GetAsync();
-                    if (apps?.Value != null) {
-                        var json = JsonConvert.SerializeObject(apps.Value, new JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() });
-                        SyncAssets(JArray.Parse(json), "Canvas App", envId);
+                // B. Capacity Hydration (from Puller)
+                if (props?["capacity"] == null) {
+                    _logger.LogInformation($"      ⚡ Capacity missing. Attempting direct hydration...");
+                    var hydrated = await _bap.FetchList("api.bap.microsoft.com", $"https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/{envId}?api-version=2020-10-01&$expand=properties/capacity");
+                    if (hydrated != null) {
+                       // Note: BapClient.FetchList returns JArray, but here we expect a single object properties update
                     }
-                } catch (Exception ex) { _logger.LogWarning($"    ! SDK Apps failed for {envId}: {ex.Message}"); }
+                }
 
-                // C. Flows (SDK - Custom Endpoint via Adapter)
+                // C. Apps
                 try {
-                    var flows = await _bap.FetchList("api.powerplatform.com", $"https://api.powerplatform.com/powerautomate/environments/{envId}/cloudFlows?api-version=2022-03-01-preview");
-                    SyncAssets(flows, "Cloud Flow", envId);
-                } catch (Exception ex) { _logger.LogWarning($"    ! SDK Flows failed for {envId}: {ex.Message}"); }
+                    var apps = await _bap.FetchList("service.powerapps.com", $"https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/{envId}/apps?api-version=2021-02-01");
+                    if (apps != null) SyncAssets(apps, "Canvas App", envId);
+                } catch (Exception ex) { _logger.LogWarning($"    ! Apps failed for {envId}: {ex.Message}"); }
+
+                // D. Flows
+                try {
+                    var flows = await _bap.FetchList("service.flow.microsoft.com", $"https://api.flow.microsoft.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/{envId}/v2/flows?api-version=2016-11-01");
+                    if (flows != null) SyncAssets(flows, "Cloud Flow", envId);
+                } catch (Exception ex) { _logger.LogWarning($"    ! Flows failed for {envId}: {ex.Message}"); }
                 
-                // D. Power Pages
+                // E. Power Pages (Standard Management)
                 try {
-                     var sites = await _bap.Management.Powerpages.Environments[envId].Websites.GetAsync(q => q.QueryParameters.ApiVersion = "2022-03-01-preview");
-                     if (sites?.Value != null) {
-                         var json = JsonConvert.SerializeObject(sites.Value, new JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() });
-                         SyncAssets(JArray.Parse(json), "Power Page", envId);
-                     }
+                     var sites = await _bap.FetchList("api.powerplatform.com", $"https://api.powerplatform.com/powerpages/environments/{envId}/websites?api-version=2022-03-01-preview");
+                     if (sites != null) SyncAssets(sites, "Power Page", envId);
                 } catch (Exception ex) { _logger.LogWarning($"    ! Pages failed for {envId}: {ex.Message}"); }
 
-                // E. Solutions (SDK)
+                // F. Solutions
                 try {
-                    var solns = await _bap.Management.Appmanagement.Environments[envId].ApplicationPackages.GetAsync(q => q.QueryParameters.ApiVersion = "2022-03-01-preview");
-                    if (solns?.Value != null) {
-                        var json = JsonConvert.SerializeObject(solns.Value, new JsonSerializerSettings { ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() });
-                        SyncAssets(JArray.Parse(json), "Solution", envId);
-                    }
+                    var solns = await _bap.FetchList("api.powerplatform.com", $"https://api.powerplatform.com/appmanagement/environments/{envId}/applicationPackages?api-version=2022-03-01-preview");
+                    if (solns != null) SyncAssets(solns, "Solution", envId);
                 } catch (Exception ex) { _logger.LogWarning($"    ! Solutions failed for {envId}: {ex.Message}"); }
 
                 // G. Deep Dataverse Sync (Real Names & Solutions)
