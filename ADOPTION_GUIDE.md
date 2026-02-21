@@ -26,25 +26,18 @@ For the `InventoryPuller` or `Azure Function` to run autonomously, you need an A
 
 ### 2. Interactive Login (The "Full Hydration" Mode)
 The project supports an `--interactive` flag. This uses **Device Auth Code** via the Azure CLI identity (`04b07795-8ddb-461a-bbee-02f9e1bf7b46`).
-*   **Why?**: Certain tenant-level APIs (like **User Licenses** and **Environment Storage Breakdown**) are restricted to interactive user contexts in many tenant configurations and fail with pure SPN access.
-*   **Usage**: Run `InventoryPuller.exe --interactive` to perform a full global sync.
+*   **Why?**: Certain critical tenant-level APIs (like **User Licenses** and **Environment Level Storage/Size Data**) are strictly restricted to interactive user contexts in many tenant configurations. A pure Service Principal (SPN) often receives empty or "Unauthorized" responses for these specific metrics.
+*   **Usage**: Run `InventoryPuller.exe --interactive` to perform a full global sync including storage breakdown.
 
 ## 🚀 Deployment Steps
 
 ### Phase 1: Dataverse Setup
 1. **Import Solution**: Import the unmanaged solution from `Solutions/InventorySolution_Unmanaged.zip` into your dedicated Governance environment.
-   *   **Note**: This solution currently includes the PCF Dashboard control and a modified **User (SystemUser)** form named "Asset Inventory Dashboard".
-2. **PCF Form Placement**: 
-   *   Navigate to the **SystemUser** table > **Forms**.
-   *   Open the "Asset Inventory Dashboard" form.
-   *   The PCF control is already placed on the `Middle Name` (`middlename`) field.
-   *   **Action**: For the best experience, we recommend removing all other controls from this section/tab or expanding the PCF section to occupy the full width/height of the form.
-3. **Table Schema**: 
-   *   Ensure the following custom tables exist in your environment (these should be part of the solution, but verify if they were created during import):
-       *   `gov_environment`
-       *   `gov_solution`
-       *   `gov_asset`
-   *   If they derived from the import, you are ready. If not, please refer to `Docs/DataverseSchemaDocumentation.html` to manually verify the schema.
+   *   **What this does**: Importing this solution automatically creates the custom tables (`gov_environment`, `gov_solution`, `gov_asset`), registers the PCF Dashboard control, and configures the **User (SystemUser)** form.
+2. **Dashboard Access**: 
+   *   The Dashboard is embedded in a custom form on the **SystemUser** table named "Asset Inventory Dashboard".
+   *   The PCF control is bound to the `Middle Name` (`middlename`) field for maximum compatibility.
+   *   **Tip**: Once imported, you can set this form as the default for your Governance admins to provide a seamless "Full Screen" dashboard experience.
 
 ### Phase 2: Inventory Puller Configuration
 1.  Navigate to `InventoryPuller/`.
@@ -95,8 +88,8 @@ See `Docs/DataverseSchemaDocumentation.html` for a full visual breakdown.
 ### Why do I need to login interactively with `--interactive`?
 While 90% of the data (Apps, Flows, Solutions) can be fetched by a Service Principal, Microsoft currently restricts certain **Tenant-Level Admin APIs** to interactive user contexts:
 *   **User License Counts**: Requires an interactive OIB (On behalf of) token in many tenant configurations.
-*   **Capacity Breakdown**: Some legacy BAP capacity endpoints only return data for the logged-in admin user.
-*   **Tip**: Use `--interactive` once a week for a "Full Hydration" of global metrics, and use the standard SPN sync for daily asset tracking.
+*   **Environment Size/Storage Breakdown**: Many storage-related BAP capacity endpoints only return granular data for the logged-in admin user and will return "0" or "Access Denied" for SPNs.
+*   **Tip**: Use `--interactive` once a week for a "Full Hydration" of these global metrics, and use the standard SPN sync for daily asset tracking.
 
 ### The Dashboard is blank after import!
 1.  Ensure you have run the `InventoryPuller` at least once to populate the Dataverse tables.
